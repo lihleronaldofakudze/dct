@@ -38,7 +38,10 @@ class _ProductScreenState extends State<ProductScreen> {
               elevation: 0.0,
               actions: [
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/style',
+                        arguments: product!.style);
+                  },
                   child: Text(
                     product!.style,
                     style: TextStyle(fontSize: 18),

@@ -36,7 +36,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'New Customer',
+                    image == null ? 'New Customer' : 'Customer Details',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(
@@ -93,7 +93,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       '${_firstNameController.text} ${_lastNameController.text}',
                                   address: _addressController.text,
                                   role: _role,
-                                  cartAmount: 0.0)
+                                  cartAmount: 0.0001)
                               .then((value) {
                             setState(() {
                               _loading = false;

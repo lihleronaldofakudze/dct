@@ -162,8 +162,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                     actions: [
                                       TextButton(
                                           onPressed: () =>
-                                              Navigator.pushNamed(context, '/'),
-                                          child: Text('Try again.'))
+                                              Navigator.pop(context),
+                                          child: Text('Ok'))
                                     ],
                                   ));
                         }

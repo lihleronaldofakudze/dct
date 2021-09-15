@@ -1,25 +1,33 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dreams_come_true/models/Cart.dart';
 import 'package:dreams_come_true/models/Customer.dart';
+import 'package:dreams_come_true/models/Order.dart';
 import 'package:dreams_come_true/models/Product.dart';
 
 class DatabaseService {
   final String? uid;
   final String? productId;
   final String? productCategory;
+  final String? orderId;
+  final String? style;
 
-  DatabaseService({this.uid, this.productId, this.productCategory});
+  DatabaseService(
+      {this.uid,
+      this.productId,
+      this.productCategory,
+      this.orderId,
+      this.style});
 
-  final CollectionReference productsCollection =
+  final CollectionReference _productsCollection =
       FirebaseFirestore.instance.collection('dct_products');
-  final CollectionReference usersCollection =
+  final CollectionReference _usersCollection =
       FirebaseFirestore.instance.collection('dct_users');
-  final CollectionReference paymentsCollection =
-      FirebaseFirestore.instance.collection('dct_payments');
+  final CollectionReference _ordersCollection =
+      FirebaseFirestore.instance.collection('dct_orders');
 
   //User Existence
   checkForUser() async {
-    DocumentSnapshot documentSnapshot = await usersCollection.doc(uid).get();
+    DocumentSnapshot documentSnapshot = await _usersCollection.doc(uid).get();
     if (documentSnapshot.exists) {
       return true;
     } else {
@@ -34,26 +42,27 @@ class DatabaseService {
       required String address,
       required String role,
       required double cartAmount}) async {
-    return usersCollection.doc(uid).set({
+    return _usersCollection.doc(uid).set({
       'image': image,
       'name': name,
       'address': address,
       'role': role,
-      'cartAmount': cartAmount
+      'cartAmount': cartAmount,
     });
   }
 
   Customer _userFromSnapshot(DocumentSnapshot snapshot) {
     return Customer(
-        image: snapshot.get('image'),
-        name: snapshot.get('name'),
-        address: snapshot.get('address'),
-        role: snapshot.get('role'),
-        cartAmount: snapshot.get('cartAmount'));
+      image: snapshot.get('image'),
+      name: snapshot.get('name'),
+      address: snapshot.get('address'),
+      role: snapshot.get('role'),
+      cartAmount: snapshot.get('cartAmount'),
+    );
   }
 
   Stream<Customer> get customer {
-    return usersCollection.doc(uid).snapshots().map(_userFromSnapshot);
+    return _usersCollection.doc(uid).snapshots().map(_userFromSnapshot);
   }
 
   Future addProduct(
@@ -64,7 +73,7 @@ class DatabaseService {
       required String sizes,
       required double price,
       required String category}) {
-    return productsCollection.add({
+    return _productsCollection.add({
       'image': image,
       'title': title,
       'brand': brand,
@@ -87,7 +96,7 @@ class DatabaseService {
     required double price,
     required String category,
   }) {
-    return productsCollection.doc(productId).update({
+    return _productsCollection.doc(productId).update({
       'image': image,
       'title': title,
       'brand': brand,
@@ -115,7 +124,7 @@ class DatabaseService {
   }
 
   Stream<List<Product>> get products {
-    return productsCollection
+    return _productsCollection
         .orderBy('postedAt', descending: true)
         .snapshots()
         .map(_productsFromSnapshot);
@@ -136,39 +145,54 @@ class DatabaseService {
   }
 
   Stream<Product> get product {
-    return productsCollection
+    return _productsCollection
         .doc(productId)
         .snapshots()
         .map(_productFromSnapshot);
   }
 
   Stream<List<Product>> get productByCategory {
-    return productsCollection
+    return _productsCollection
         .where('category', isEqualTo: productCategory)
         .snapshots()
         .map(_productsFromSnapshot);
   }
 
+  Stream<List<Product>> get productByStyles {
+    return _productsCollection
+        .where('style', isEqualTo: style)
+        .snapshots()
+        .map(_productsFromSnapshot);
+  }
+
+  Stream<List<Product>> get productByStyle {
+    return _productsCollection
+        .limit(4)
+        .orderBy('style')
+        .snapshots()
+        .map(_productsFromSnapshot);
+  }
+
   Stream<List<Product>> get favorites {
-    return productsCollection
+    return _productsCollection
         .where('likes', arrayContains: uid)
         .snapshots()
         .map(_productsFromSnapshot);
   }
 
   Future deleteProduct() async {
-    return productsCollection.doc(productId).delete();
+    return _productsCollection.doc(productId).delete();
   }
 
   //likes
   Future like() {
-    return productsCollection.doc(productId).update({
+    return _productsCollection.doc(productId).update({
       'likes': FieldValue.arrayUnion([uid]),
     });
   }
 
   Future unLike() {
-    return productsCollection.doc(productId).update({
+    return _productsCollection.doc(productId).update({
       'likes': FieldValue.arrayRemove([uid]),
     });
   }
@@ -180,12 +204,12 @@ class DatabaseService {
       required double price,
       required int quantity}) async {
     DocumentSnapshot documentSnapshot =
-        await usersCollection.doc(uid).collection('cart').doc(productId).get();
+        await _usersCollection.doc(uid).collection('cart').doc(productId).get();
 
     if (documentSnapshot.exists) {
       return null;
     } else {
-      return usersCollection.doc(uid).collection('cart').doc(productId).set({
+      return _usersCollection.doc(uid).collection('cart').doc(productId).set({
         'image': image,
         'title': title,
         'style': style,
@@ -193,7 +217,7 @@ class DatabaseService {
         'addedAt': new DateTime.now(),
         'quantity': quantity
       }).then((value) {
-        return usersCollection
+        return _usersCollection
             .doc(uid)
             .update({'cartAmount': FieldValue.increment(price)});
       });
@@ -214,7 +238,7 @@ class DatabaseService {
   }
 
   Stream<List<Cart>> get cart {
-    return usersCollection
+    return _usersCollection
         .doc(uid)
         .collection('cart')
         .orderBy('addedAt', descending: true)
@@ -223,37 +247,118 @@ class DatabaseService {
   }
 
   Future incrementCart({required double price}) {
-    return usersCollection
+    return _usersCollection
         .doc(uid)
         .collection('cart')
         .doc(productId)
         .update({'quantity': FieldValue.increment(1)}).then((value) {
-      return usersCollection
+      return _usersCollection
           .doc(uid)
           .update({'cartAmount': FieldValue.increment(price)});
     });
   }
 
   Future decrementCart({required double price}) {
-    return usersCollection
+    return _usersCollection
         .doc(uid)
         .collection('cart')
         .doc(productId)
         .update({'quantity': FieldValue.increment(-1)}).then((value) {
-      return usersCollection
+      return _usersCollection
           .doc(uid)
           .update({'cartAmount': FieldValue.increment(-price)});
     });
   }
 
   Future deleteCart() {
-    return usersCollection.doc(uid).collection('cart').doc(productId).delete();
+    return _usersCollection.doc(uid).collection('cart').doc(productId).delete();
   }
 
-  cartTotal() async {
+  Future checkOut({required double total, required String orderName}) async {
     QuerySnapshot cart =
-        await usersCollection.doc(uid).collection('cart').get();
-    List<DocumentSnapshot> myCart = cart.docs;
-    return myCart.length; // Count of Documents in Collection
+        await _usersCollection.doc(uid).collection('cart').get();
+    final orderDetails = cart.docs.map((doc) => doc.data()).toList();
+    return _ordersCollection.add({
+      'uid': uid,
+      'orderName': orderName,
+      'orderDetails': orderDetails,
+      'orderStatus': 'Pending',
+      'total': total
+    }).then((value) async {
+      for (var doc in cart.docs) {
+        await doc.reference.delete();
+      }
+    }).then((value) {
+      return _usersCollection.doc(uid).update({'cartAmount': 0.0001});
+    });
+  }
+
+  Order _orderFromSnapshot(DocumentSnapshot snapshot) {
+    List<Cart> cart = [];
+    List<dynamic> cartMap = snapshot.get('orderDetails');
+    cartMap.forEach((element) {
+      cart.add(new Cart(
+          id: '',
+          image: element['image'],
+          title: element['title'],
+          style: element['style'],
+          price: element['price'],
+          addedAt: element['addedAt'],
+          quantity: element['quantity']));
+    });
+    return Order(
+        id: snapshot.id,
+        uid: snapshot.get('uid'),
+        orderName: snapshot.get('orderName'),
+        orderStatus: snapshot.get('orderStatus'),
+        total: snapshot.get('total'),
+        orderDetails: cart);
+  }
+
+  List<Order> _ordersFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.docs.map((doc) {
+      List<Cart> cart = [];
+      List<dynamic> cartMap = doc.get('orderDetails');
+      cartMap.forEach((element) {
+        cart.add(new Cart(
+            id: '',
+            image: element['image'],
+            title: element['title'],
+            style: element['style'],
+            price: element['price'],
+            addedAt: element['addedAt'],
+            quantity: element['quantity']));
+      });
+      return Order(
+          id: doc.id,
+          uid: doc.get('uid'),
+          orderName: doc.get('orderName'),
+          orderStatus: doc.get('orderStatus'),
+          total: doc.get('total'),
+          orderDetails: cart);
+    }).toList();
+  }
+
+  Stream<Order> get order {
+    return _ordersCollection.doc(orderId).snapshots().map(_orderFromSnapshot);
+  }
+
+  Stream<List<Order>> get orders {
+    return _ordersCollection.snapshots().map(_ordersFromSnapshot);
+  }
+
+  Stream<List<Order>> get customerOrders {
+    return _ordersCollection
+        .where('uid', isEqualTo: uid)
+        .snapshots()
+        .map(_ordersFromSnapshot);
+  }
+
+  Future updateOrderStatus({required String status}) {
+    return _ordersCollection.doc(orderId).update({'orderStatus': status});
+  }
+
+  Future deleteOrder() {
+    return _ordersCollection.doc(orderId).delete();
   }
 }

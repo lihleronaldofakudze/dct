@@ -1,7 +1,12 @@
+import 'package:dreams_come_true/models/Product.dart';
+import 'package:dreams_come_true/services/database.dart';
+import 'package:dreams_come_true/widget/home_carousel.dart';
 import 'package:dreams_come_true/widget/home_categories_list.dart';
+import 'package:dreams_come_true/widget/home_style.dart';
 import 'package:dreams_come_true/widget/new_arrivals_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -26,7 +31,20 @@ class HomeScreen extends StatelessWidget {
         ),
         elevation: 0.0,
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.info_outline_rounded)),
+          IconButton(
+              onPressed: () {
+                showAboutDialog(
+                    context: context,
+                    applicationName: 'Dreams Come True',
+                    applicationVersion: '1.0.0',
+                    applicationIcon: Container(
+                      height: 100,
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: AssetImage('images/logo.png'))),
+                    ));
+              },
+              icon: Icon(Icons.info_outline_rounded)),
         ],
       ),
       body: Container(
@@ -37,13 +55,7 @@ class HomeScreen extends StatelessWidget {
               height: 100,
               child: HomeCategoryList(),
             ),
-            Container(
-              height: 400,
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('images/1 (20).jpg'),
-                      fit: BoxFit.cover)),
-            ),
+            HomeCarousel(),
             SizedBox(
               height: 5,
             ),
@@ -83,146 +95,10 @@ class HomeScreen extends StatelessWidget {
             SizedBox(
               height: 10,
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 200,
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: AssetImage('images/1 (44).jpg'),
-                                fit: BoxFit.cover)),
-                      ),
-                      SizedBox(
-                        height: 3,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: Text(
-                          'Holiday',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 7,
-                      ),
-                      Text(
-                        'Summer styles',
-                        style: TextStyle(color: Colors.grey),
-                      )
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 200,
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: AssetImage('images/1 (43).jpg'),
-                                fit: BoxFit.cover)),
-                      ),
-                      SizedBox(
-                        height: 3,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: Text(
-                          'Party Time',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 7,
-                      ),
-                      Text(
-                        'New collection',
-                        style: TextStyle(color: Colors.grey),
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 200,
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: AssetImage('images/1 (41).jpg'),
-                                fit: BoxFit.cover)),
-                      ),
-                      SizedBox(
-                        height: 3,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: Text(
-                          'Summer Look',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 7,
-                      ),
-                      Text(
-                        'New styles',
-                        style: TextStyle(color: Colors.grey),
-                      )
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 200,
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: AssetImage('images/1 (42).jpg'),
-                                fit: BoxFit.cover)),
-                      ),
-                      SizedBox(
-                        height: 3,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: Text(
-                          'Hot Bikini',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 7,
-                      ),
-                      Text(
-                        'New collection',
-                        style: TextStyle(color: Colors.grey),
-                      )
-                    ],
-                  ),
-                )
-              ],
+            StreamProvider<List<Product>>.value(
+              value: DatabaseService().productByStyle,
+              initialData: [],
+              child: HomeStyle(),
             ),
             SizedBox(
               height: 20,

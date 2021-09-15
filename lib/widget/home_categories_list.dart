@@ -24,6 +24,7 @@ class HomeCategoryList extends StatelessWidget {
       Category(category: 'Vintage', image: 'images/1 (14).jpg'),
     ];
     return ListView.builder(
+      shrinkWrap: true,
       itemCount: categories.length,
       scrollDirection: Axis.horizontal,
       itemBuilder: (context, index) {

@@ -187,18 +187,17 @@ class _PersonScreenState extends State<PersonScreen> {
                                 fontSize: 16, color: Colors.brown.shade300)),
                       ),
                     ),
-                    // InkWell(
-                    //   onTap: () {},
-                    //   child: ListTile(
-                    //     title: Text(
-                    //       'My Orders',
-                    //       style: TextStyle(fontSize: 18),
-                    //     ),
-                    //     trailing: Text('2 Orders',
-                    //         style: TextStyle(
-                    //             fontSize: 16, color: Colors.brown.shade300)),
-                    //   ),
-                    // ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/customer_orders');
+                      },
+                      child: ListTile(
+                        title: Text(
+                          'My Orders',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
+                    ),
                     // InkWell(
                     //   onTap: () {},
                     //   child: ListTile(
@@ -211,15 +210,15 @@ class _PersonScreenState extends State<PersonScreen> {
                     //             fontSize: 16, color: Colors.brown.shade300)),
                     //   ),
                     // ),
-                    InkWell(
-                      onTap: () {},
-                      child: ListTile(
-                        title: Text(
-                          'Payments',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                    ),
+                    // InkWell(
+                    //   onTap: () {},
+                    //   child: ListTile(
+                    //     title: Text(
+                    //       'Payments',
+                    //       style: TextStyle(fontSize: 18),
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),

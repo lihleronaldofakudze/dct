@@ -2,12 +2,16 @@ import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:dreams_come_true/models/Product.dart';
 import 'package:dreams_come_true/models/RegisteredUser.dart';
 import 'package:dreams_come_true/screens/admin/add_product_screen.dart';
+import 'package:dreams_come_true/screens/admin/admin_order_screen.dart';
 import 'package:dreams_come_true/screens/admin/admin_screen.dart';
 import 'package:dreams_come_true/screens/auth_state.dart';
 import 'package:dreams_come_true/screens/edit_profile_screen.dart';
 import 'package:dreams_come_true/screens/user/category_screen.dart';
+import 'package:dreams_come_true/screens/user/customer_order_screen.dart';
+import 'package:dreams_come_true/screens/user/customer_orders_screen.dart';
 import 'package:dreams_come_true/screens/user/main_screen.dart';
 import 'package:dreams_come_true/screens/user/product_screen.dart';
+import 'package:dreams_come_true/screens/user/style_screen.dart';
 import 'package:dreams_come_true/services/auth.dart';
 import 'package:dreams_come_true/services/database.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -69,10 +73,14 @@ class MyApp extends StatelessWidget {
           //Customer
           '/category': (context) => CategoryScreen(),
           '/main': (context) => MainScreen(),
+          '/customer_orders': (context) => CustomerOrdersScreen(),
+          '/customer_order': (context) => CustomerOrderScreen(),
+          '/style': (context) => StyleScreen(),
 
           //Admin
           '/admin': (context) => AdminScreen(),
           '/add_product': (context) => AddProductScreen(),
+          '/admin_order': (context) => AdminOrderScreen(),
         },
         title: 'Dreams Come True',
         debugShowCheckedModeBanner: false,
